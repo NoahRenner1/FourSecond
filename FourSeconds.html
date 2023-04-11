@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Click in 4 Seconds Challenge</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.0.0-alpha1/css/bootstrap.min.css" />
+  <style>
+    .jumbotron {
+      background-color: #fff;
+    }
+    .btn-lg {
+      font-size: 3rem;
+      padding: 1rem 2.5rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="jumbotron mt-5 text-center">
+    <h1>Click in 4 Seconds Challenge</h1>
+    <p>Click the button below as close as possible to 4 seconds</p>
+    <button id="startButton" class="btn btn-primary btn-lg">Start</button>
+    <p class="mt-3" id="timeDisplay"></p>
+  </div>
+</div>
+<script>
+  const CLICK_TARGET = 4000;
+  let startTime, endTime, elapsedTime;
+  let attempts = [];
+  let attemptNumber = 1;
+
+  const startButton = document.querySelector("#startButton");
+  const timeDisplay = document.querySelector("#timeDisplay");
+
+  startButton.addEventListener("click", () => {
+    if (startButton.textContent === "Start") {
+      startButton.classList.remove("btn-primary");
+      startButton.classList.add("btn-success");
+      startButton.classList.add("btn-lg");
+      startButton.textContent = "Stop";
+      startTime = new Date();
+    } else {
+      startButton.classList.remove("btn-success");
+      startButton.classList.add("btn-primary");
+      startButton.classList.add("btn-lg");
+      startButton.textContent = "Start";
+      endTime = new Date();
+      elapsedTime = endTime - startTime;
+      attempts.push(elapsedTime);
+      timeDisplay.textContent = `Attempt ${attemptNumber}: ${elapsedTime} ms`;
+      attemptNumber++;
+      const ctx = document.getElementById('myChart').getContext('2d');
+
+      const labels = attempts.map((attempt, index) => `Attempt ${index + 1}`);
+
+      const data = attempts.map(attempt => attempt / 1000);
+
+      const totalAttempts = attempts.length;
+      const minTime = Math.min(...data);
+      const maxTime = Math.max(...data);
+      const avgTime = (data.reduce((acc, curr) => acc + curr, 0) / totalAttempts).toFixed(2);
+
+
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Attempt Times (seconds)',
+            data,
+            backgroundColor: 'rgba(90,86,175,0.2)',
+            borderColor: 'rgb(89,73,180)',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          title: {
+            display: true,
+            text: `Click in 4 Seconds Challenge Results (n=${totalAttempts}, min=${minTime}s, max=${maxTime}s, avg=${avgTime}s)`
+          },
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true
+              }
+            }]
+          }
+        }
+      });
+
+    }
+  });
+
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+<canvas id="myChart"></canvas>
+</body>
+</html>
